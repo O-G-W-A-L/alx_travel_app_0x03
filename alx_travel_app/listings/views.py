@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from .models import Listing, Booking, Payment
 from .serializers import ListingSerializer, BookingSerializer
+from .tasks import send_booking_confirmation_email
 
 import requests
 import uuid
@@ -25,7 +26,19 @@ class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        booking = serializer.save(user=self.request.user)
+        # Trigger the Celery task to send a booking confirmation email
+        listing_title = booking.listing.title
+        user_email = booking.user.email
+        booking_details = (
+            f"Listing: {listing_title}\n"
+            f"Check-in: {booking.check_in_date}\n"
+            f"Check-out: {booking.check_out_date}\n"
+            f"Total Price: {booking.total_price}"
+        )
+        send_booking_confirmation_email.delay(
+            booking.id, user_email, listing_title, booking_details
+        )
 
 
 class InitiatePaymentView(APIView):

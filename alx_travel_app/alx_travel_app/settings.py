@@ -13,8 +13,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-import django_heroku
-
 import dj_database_url
 
 load_dotenv()
@@ -135,7 +133,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

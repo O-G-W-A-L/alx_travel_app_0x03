@@ -27,7 +27,11 @@ CHAPA_SECRET_KEY = os.getenv("CHAPA_SECRET_KEY")
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+default_hosts = ['127.0.0.1', 'localhost', '.onrender.com']
+env_hosts = os.getenv('ALLOWED_HOSTS', '')
+
+# Combine default + env values
+ALLOWED_HOSTS = default_hosts + [h.strip() for h in env_hosts.split(',') if h.strip()]
 
 
 
